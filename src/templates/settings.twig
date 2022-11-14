@@ -1,0 +1,81 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Telemetron plugin for Craft CMS 3.x
+ *
+ * Telemetron Settings.twig
+ *
+ * @author    Good Work
+ * @copyright Copyright (c) 2022 Good Work
+ * @link      https://simplygoodwork.com
+ * @package   Telemetron
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+
+{% set scriptTagOptions = {
+    'depends': [
+        'simplygoodwork\\telemetron\\assetbundles\\telemetron\\TelemetronAsset'
+    ],
+} %}
+
+{{ craft.telemetron.register('src/index.js', false, scriptTagOptions) }}
+
+<div>
+    {{ forms.autosuggestField({
+        label: 'Base ID',
+        instructions: 'Your Airtable Base ID can be retrieved by going [here](https://airtable.com/api) and selecting the Base you want to interact with.',
+        id: 'baseId',
+        name: 'baseId',
+        value: settings['baseId'],
+        suggestEnvVars: true,
+        required: false,
+        warning: _self.configWarning("baseId", "telemetron"),
+        placeholder: "$TELEMETRON_BASE_ID",
+    }) }}
+
+    {{ forms.autosuggestField({
+        label: 'Airtable API Key',
+        instructions: 'Your Airtable API key',
+        id: 'apiKey',
+        name: 'apiKey',
+        value: settings['apiKey'],
+        suggestEnvVars: true,
+        required: false,
+        warning: _self.configWarning("apiKey", "telemetron"),
+        placeholder: "$TELEMETRON_API_KEY",
+    }) }}
+
+    {{ forms.autosuggestField({
+        label: 'Table Name',
+        instructions: 'The Airtable table you want this plugin to save information to.',
+        id: 'tableName',
+        name: 'tableName',
+        value: settings['tableName'],
+        suggestEnvVars: true,
+        warning: _self.configWarning("tableName", "telemetron"),
+        required: false
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Sync Enabled"|t('telemetron'),
+        id: 'syncEnabled',
+        name: 'syncEnabled',
+        warning: _self.configWarning("syncEnabled", "telemetron"),
+        on: settings.syncEnabled,
+    }) }}
+</div>
+
+
+{# Credit to nystudio107 for this handy snippet #}
+{% macro configWarning(setting, file) -%}
+  {%- set configArray = craft.app.config.getConfigFromFile(file) -%}
+  {%- if configArray[setting] is defined -%}
+      {{- "This is being overridden by the `#{setting}` setting in the `config/#{file}.php` file." |raw }}
+  {%- else -%}
+      {{ false }}
+  {%- endif -%}
+{%- endmacro %}

@@ -1,0 +1,42 @@
+{
+    "name": "simplygoodwork/craft-telemetron",
+    "description": "Send your Craft \"telemetry\" like versions, installed plugins, and more to Airtable.",
+    "type": "craft-plugin",
+    "version": "3.0.1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "telemetron"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Good Work",
+            "homepage": "https://simplygoodwork.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "craftcms/cms": "^3.1.0",
+        "zadorin/airtable-php": "0.6.0",
+        "nystudio107/craft-plugin-vite": "^1.0.31"
+    },
+    "autoload": {
+        "psr-4": {
+          "simplygoodwork\\telemetron\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Telemetron",
+        "handle": "telemetron",
+        "developer": "Good Work",
+        "developerUrl": "https://simplygoodwork.com",
+        "components": {
+            "sync": "simplygoodwork\\telemetron\\services\\Sync"
+        },
+        "class": "simplygoodwork\\telemetron\\Telemetron"
+    }
+}
