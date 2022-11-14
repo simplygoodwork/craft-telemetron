@@ -1,0 +1,26 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Telemetron plugin for Craft CMS
+ *
+ * Telemetron Widget Settings
+ *
+ * @author    Good Work
+ * @copyright Copyright (c) 2022 Good Work
+ * @link      https://simplygoodwork.com
+ * @package   Telemetron
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("simplygoodwork\\telemetron\\assetbundles\\telemetron\\TelemetronAsset") %}
+
+{{ forms.textField({
+    label: 'Message',
+    instructions: 'Enter a message here.',
+    id: 'message',
+    name: 'message',
+    value: widget['message']})
+}}
