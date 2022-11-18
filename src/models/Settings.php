@@ -10,6 +10,7 @@
 
 namespace simplygoodwork\telemetron\models;
 
+use craft\behaviors\EnvAttributeParserBehavior;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use simplygoodwork\telemetron\Telemetron;
@@ -54,9 +55,9 @@ class Settings extends Model
   public $tableName;
 
 	/**
-	 * @var string
+	 * @var bool
 	 */
-	public $syncEnabled;
+	public $syncEnabled = false;
 
   // Public Methods
   // =========================================================================
@@ -69,6 +70,19 @@ class Settings extends Model
     $config['tableName'] = StringHelper::toTitleCase(getenv('ENVIRONMENT')) . ' Inventory';
     parent::__construct($config);
   }
+
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors(): array
+	{
+		return [
+			'parser' => [
+				'class' => EnvAttributeParserBehavior::class,
+				'attributes' => ['baseId', 'tableName', 'apiKey'],
+			],
+		];
+	}
 
   /**
    * Returns the validation rules for attributes.
@@ -84,60 +98,5 @@ class Settings extends Model
           [['baseId', 'apiKey', 'tableName'], 'required'],
       ];
   }
-
-  /**
-   *
-   * @return string
-   */
-  public function getBaseId(): string
-  {
-    if(!empty($this->baseId)){
-      return getenv($this->baseId) ?? $this->baseId;
-    }
-    return getenv("TELEMETRON_BASE_ID") ?? '';
-  }
-
-  public function getApiKey(): string
-  {
-    if(!empty($this->apiKey)){
-      return getenv($this->apiKey) ?? $this->apiKey;
-    }
-    return getenv("TELEMETRON_API_KEY") ?? '';
-  }
-
-  public function getTableName(): string
-  {
-    return getenv($this->tableName) ?? $this->tableName;
-  }
-
-	public function getSyncEnabled(): bool
-	{
-		// if env var has been set in settings but the env var has not been set and we're in production, turn on sync
-		if($this->syncEnabled !== '0' && $this->syncEnabled !== '1' && !isset($_ENV[$this->syncEnabled]) && getenv('ENVIRONMENT') === 'production')
-		{
-			return true;
-		}
-
-    if(!empty($this->syncEnabled)){
-      if(is_bool($this->syncEnabled)){
-        return $this->syncEnabled;
-      }
-      $enabled = getenv($this->syncEnabled);
-      $boolMap = [
-        'true' => true,
-        'false' => false,
-        '1' => true,
-        '0' => false,
-        'yes' => true,
-        'no' => false,
-        'on' => true,
-        'off' => false,
-        '' => false,
-      ];
-      return $boolMap[$enabled] ?? $this->syncEnabled ?? false;
-    }
-    
-		return getenv("TELEMETRON_ENABLED") ?? false;
-	}
 
 }
