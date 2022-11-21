@@ -2,19 +2,25 @@
 
 Send your Craft "telemetry" like versions, installed plugins, and more to Airtable.
 
-![Screenshot](resources/img/plugin-logo.png)
+Follow the [@simplygoodwork](https://twitter.com/simplygoodwork) Twitter account for updates.
 
 ## Requirements
 
 This plugin requires Craft CMS 4.0.0 or later.
 
-## Quickstart
+## Installation
 
-Install via
+To install the plugin, follow these instructions.
 
-```shell
-composer require simplygoodwork/craft-telemetron
-```
+1.  Open your terminal and go to your Craft project:
+
+        cd /path/to/project
+
+2.  Then tell Composer to load the plugin:
+
+        composer require simplygoodwork/craft-telemetron
+
+3.  In the Control Panel, go to Settings → Plugins and click the “Install” button for Telemetron.
 
 Add the following Environment variables to the environment you want tracked:
 
@@ -93,3 +99,8 @@ This plugin assumes you are using Airtable and have the following tables setup a
 
 - Add Events before writing to each Table so that users can customize the data being sent to Airtable
 - Add support for custom data to be sent to Airtable from within the Settings
+
+
+---
+
+Brought to you by [Good Work](https://simplygoodwork.com). Happy Pinning!
