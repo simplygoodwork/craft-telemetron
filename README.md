@@ -103,4 +103,4 @@ This plugin assumes you are using Airtable and have the following tables setup a
 
 ---
 
-Brought to you by [Good Work](https://simplygoodwork.com). Happy Pinning!
+Brought to you by [Good Work](https://simplygoodwork.com).
