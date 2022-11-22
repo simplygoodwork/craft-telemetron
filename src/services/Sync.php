@@ -61,7 +61,7 @@ class Sync extends Component
 	public function sync(): array
 	{
 		$settings = Telemetron::$plugin->settings;
-		
+
 		if(!$settings->getSyncEnabled()){
 			return [
 				'success' => false,
@@ -198,25 +198,31 @@ class Sync extends Component
 	{
 		$tableName = rawurlencode('Craft Versions');
 
-		$recordLookup = $this->airtableClient->table($tableName)
-			->select('*')
-			->where(['Name' => $craftVersion])
-			->limit(1)
-			->execute();
+		try{
+			$recordLookup = $this->airtableClient->table($tableName)
+				->select('*')
+				->where(['Name' => $craftVersion])
+				->limit(1)
+				->execute();
 
-		$recordExists = $recordLookup->count();
+			$recordExists = $recordLookup->count();
 
-		if($recordExists){
-			return true;
-		}
+			if($recordExists){
+				return true;
+			}
 
-		$insertRecord = $this->airtableClient->table($tableName)->insert([
-			[
-				'Name' => $craftVersion,
-			]
-		])->execute();
+			$insertRecord = $this->airtableClient->table($tableName)->insert([
+				[
+					'Name' => $craftVersion,
+				]
+			])->execute();
 
-		if(!$insertRecord->fetch()->getId()){
+			if(!$insertRecord->fetch()->getId()){
+				return false;
+			}
+		} catch(RequestError $e){
+			Craft::error($e->getMessage(), __METHOD__);
+			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
 			return false;
 		}
 
@@ -227,25 +233,30 @@ class Sync extends Component
 	{
 		$tableName = rawurlencode('PHP Versions');
 
-		$recordLookup = $this->airtableClient->table($tableName)
-			->select('*')
-			->where(['Name' => $phpVersion])
-			->limit(1)
-			->execute();
+		try {
+			$recordLookup = $this->airtableClient->table($tableName)
+				->select('*')
+				->where(['Name' => $phpVersion])
+				->limit(1)
+				->execute();
 
-		$recordExists = $recordLookup->count();
+			$recordExists = $recordLookup->count();
 
-		if($recordExists){
-			return true;
-		}
+			if($recordExists){
+				return true;
+			}
 
-		$insertRecord = $this->airtableClient->table($tableName)->insert([
-			[
-				'Name' => $phpVersion,
-			]
-		])->execute();
+			$insertRecord = $this->airtableClient->table($tableName)->insert([
+				[
+					'Name' => $phpVersion,
+				]
+			])->execute();
 
-		if(!$insertRecord->fetch()->getId()){
+			if(!$insertRecord->fetch()->getId()){
+				return false;
+			}
+		} catch(RequestError $e){
+			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
 			return false;
 		}
 
@@ -256,25 +267,30 @@ class Sync extends Component
 	{
 		$tableName = rawurlencode('Database Versions');
 
-		$recordLookup = $this->airtableClient->table($tableName)
-			->select('*')
-			->where(['Name' => $dbVersion])
-			->limit(1)
-			->execute();
+		try {
+			$recordLookup = $this->airtableClient->table($tableName)
+				->select('*')
+				->where(['Name' => $dbVersion])
+				->limit(1)
+				->execute();
 
-		$recordExists = $recordLookup->count();
+			$recordExists = $recordLookup->count();
 
-		if($recordExists){
-			return true;
-		}
+			if ($recordExists) {
+				return true;
+			}
 
-		$insertRecord = $this->airtableClient->table($tableName)->insert([
-			[
-				'Name' => $dbVersion,
-			]
-		])->execute();
+			$insertRecord = $this->airtableClient->table($tableName)->insert([
+				[
+					'Name' => $dbVersion,
+				]
+			])->execute();
 
-		if(!$insertRecord->fetch()->getId()){
+			if (!$insertRecord->fetch()->getId()) {
+				return false;
+			}
+		} catch(RequestError $e){
+			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
 			return false;
 		}
 
@@ -285,31 +301,36 @@ class Sync extends Component
 	{
 		$tableName = rawurlencode('Plugins');
 
-		foreach($plugins as $plugin){
-			$recordLookup = $this->airtableClient->table($tableName)
-				->select('Hash')
-				->where(['Hash' => $plugin->hash])
-				->limit(1)
-				->execute();
+		try {
+			foreach ($plugins as $plugin) {
+				$recordLookup = $this->airtableClient->table($tableName)
+					->select('Hash')
+					->where(['Hash' => $plugin->hash])
+					->limit(1)
+					->execute();
 
-			$recordExists = $recordLookup->count();
+				$recordExists = $recordLookup->count();
 
-			if($recordExists){
-				continue;
+				if ($recordExists) {
+					continue;
+				}
+
+				$insertRecord = $this->airtableClient->table($tableName)->insert([
+					[
+						'Hash' => $plugin->hash,
+						'Name' => $plugin->name,
+						'Version' => $plugin->version,
+						'Documentation URL' => $plugin->documentationUrl,
+					]
+				])->execute();
+
+				if (!$insertRecord->fetch()->getId()) {
+					Craft::error('Issue saving plugin record to Airtable.', __METHOD__);
+				}
 			}
-
-			$insertRecord = $this->airtableClient->table($tableName)->insert([
-				[
-					'Hash' => $plugin->hash,
-					'Name' => $plugin->name,
-					'Version' => $plugin->version,
-					'Documentation URL' => $plugin->documentationUrl,
-				]
-			])->execute();
-
-			if(!$insertRecord->fetch()->getId()){
-				Craft::error('Issue saving plugin record to Airtable.', __METHOD__);
-			}
+		} catch(RequestError $e){
+			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
+			return false;
 		}
 
 		return true;
@@ -319,10 +340,10 @@ class Sync extends Component
 	{
 		$tableName = rawurlencode('SMTP');
 		$host = $emailSettings['host'] ?? '';
-		$key = "{$emailSettings['transportType']} - {$host}({$siteUrl})";
+		$smtpHash = "{$emailSettings['transportType']} - {$host}({$siteUrl})";
 
 		$dataToSet = [
-			'Name' => $key,
+			'Name' => $smtpHash,
 			'Transportation Type' => $emailSettings['transportType'],
 			'Host' => $emailSettings['host'] ?? '',
 			'Username' => $emailSettings['username'] ?? '',
@@ -334,33 +355,38 @@ class Sync extends Component
 			'Command' => $emailSettings['command'] ?? ''
 		];
 
-		foreach($dataToSet as $key => $val){
-			if($val === ''){
-				unset($dataToSet[$key]);
+		try {
+			foreach($dataToSet as $key => $val){
+				if($val === ''){
+					unset($dataToSet[$key]);
+				}
 			}
-		}
 
-		$recordLookup = $this->airtableClient->table($tableName)
-			->select('*')
-			->where(['Name' => $key])
-			->limit(1)
-			->execute();
+			$recordLookup = $this->airtableClient->table($tableName)
+				->select('*')
+				->where(['Name' => $smtpHash])
+				->limit(1)
+				->execute();
 
-		$recordExists = $recordLookup->count();
+			$recordExists = $recordLookup->count();
 
-		if($recordExists){
-			$record = $recordLookup->fetch();
-			$record->setFields($dataToSet);
-			$this->airtableClient->table($tableName)->update($record)->typecast()->execute();
+			if($recordExists){
+				$record = $recordLookup->fetch();
+				$record->setFields($dataToSet);
+				$this->airtableClient->table($tableName)->update($record)->typecast()->execute();
 
-			return true;
-		}
+				return true;
+			}
 
-		$insertRecord = $this->airtableClient->table($tableName)->insert([
-			$dataToSet
-		])->execute();
+			$insertRecord = $this->airtableClient->table($tableName)->insert([
+				$dataToSet
+			])->execute();
 
-		if(!$insertRecord->fetch()->getId()){
+			if(!$insertRecord->fetch()->getId()) {
+				return false;
+			}
+		} catch(RequestError $e){
+			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
 			return false;
 		}
 
