@@ -2,7 +2,7 @@
     "name": "simplygoodwork/craft-telemetron",
     "description": "Send your Craft \"telemetry\" like versions, installed plugins, and more to Airtable. \n",
     "type": "craft-plugin",
-    "version": "4.0.3",
+    "version": "4.0.3.1",
     "keywords": [
         "craft",
         "cms",

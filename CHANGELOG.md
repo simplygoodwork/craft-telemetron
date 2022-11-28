@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 ## 4.0.3 - 2022-11-28
 ### Fixed
-- Fix issue that prevented Sync utility from executing in environments where adminChanges are disabled.
+- Fix issue that prevented Sync utility from executing in environments where adminChanges are disabled. (Same fix was applied to the Queue Sync controller in 4.0.3.1)
 ## 4.0.2 - 2022-11-22
 ### Fixed
 - Prevent exceptions when plugin has not been configured yet
