@@ -62,7 +62,7 @@ class SyncController extends Controller
      */
     public function actionIndex(): \yii\web\Response
     {
-				$this->requireAdmin();
+				$this->requireAdmin(false);
         return $this->asJson(Telemetron::$plugin->sync->sync());
     }
 
