@@ -71,7 +71,7 @@ class SyncController extends Controller
 		 */
 		public function actionQueueSync(): \yii\web\Response
 		{
-			$this->requireAdmin();
+			$this->requireAdmin(false);
       Craft::$app->getQueue()->push(new Sync());
       return $this->asJson('Sync job added to queue.');
     }
