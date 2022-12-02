@@ -63,30 +63,35 @@ class Sync extends Component
 		$settings = Telemetron::$plugin->settings;
 
 		if(!$settings->getSyncEnabled()){
-			return [
+			$status = [
 				'success' => false,
 				'response' => 'Sync is not enabled in this environment.'
 			];
+			Craft::warning($status, __METHOD__);
+			return $status;
 		}
 
 		$airtable = $this->_getAirtableClient();
 
 		if(!$airtable){
-			return [
+			$status = [
 				'success' => false,
 				'response' => 'Missing Airtable credentials.'
 			];
+			Craft::warning($status, __METHOD__);
+			return $status;
 		}
 
 		$packet = new Packet();
-
 		$preflightSyncs = $this->_preflightSync($packet);
 
 		if(!$preflightSyncs){
-			return [
+			$status = [
 				'success' => false,
 				'response' => 'Preflight checks failed.'
 			];
+			Craft::warning($status, __METHOD__);
+			return $status;
 		}
 
 		$host = $packet->emailSettings['host'] ?? '';
@@ -144,12 +149,19 @@ class Sync extends Component
 			];
 		} catch(RequestError $e){
 			if($airtable->getLastRequest()){
-				Craft::error(Json::decode($airtable->getLastRequest()->getPlainResponse()), __METHOD__);
+				Craft::error([
+					'message' => Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()),
+					'data' => $dataToSet
+				], __METHOD__);
 				return [
 					'success' => false,
 					'response' => Json::decode($airtable->getLastRequest()->getPlainResponse())
 				];
 			}
+			Craft::error([
+				'message' => $e->getMessage(),
+				'data' => $dataToSet
+			], __METHOD__);
 			return [
 				'success' => false,
 				'response' => $e->getMessage()
@@ -256,7 +268,10 @@ class Sync extends Component
 				return false;
 			}
 		} catch(RequestError $e){
-			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
+			Craft::error([
+				'message' => Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()),
+				'data' => $phpVersion
+			], __METHOD__);
 			return false;
 		}
 
@@ -290,7 +305,10 @@ class Sync extends Component
 				return false;
 			}
 		} catch(RequestError $e){
-			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
+			Craft::error([
+				'message' => Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()),
+				'data' => $dbVersion
+			], __METHOD__);
 			return false;
 		}
 
@@ -329,7 +347,10 @@ class Sync extends Component
 				}
 			}
 		} catch(RequestError $e){
-			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
+			Craft::error([
+				'message' => Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()),
+				'data' => $plugins
+			], __METHOD__);
 			return false;
 		}
 
@@ -386,7 +407,10 @@ class Sync extends Component
 				return false;
 			}
 		} catch(RequestError $e){
-			Craft::error(Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()), __METHOD__);
+			Craft::error([
+				'message' => Json::decode($this->airtableClient->getLastRequest()->getPlainResponse()),
+				'data' => $dataToSet
+			], __METHOD__);
 			return false;
 		}
 
