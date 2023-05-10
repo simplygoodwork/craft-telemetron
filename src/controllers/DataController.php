@@ -11,14 +11,12 @@
 namespace simplygoodwork\telemetron\controllers;
 
 use craft\helpers\App;
-use craft\services\Sites;
-use simplygoodwork\telemetron\jobs\Sync;
 use simplygoodwork\telemetron\models\Packet;
 use simplygoodwork\telemetron\Telemetron;
 
 use Craft;
 use craft\web\Controller;
-use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * Sync Controller
@@ -40,7 +38,7 @@ use yii\web\ForbiddenHttpException;
  * @package   Telemetron
  * @since     1.0.0
  */
-class SyncController extends Controller
+class DataController extends Controller
 {
 
     // Protected Properties
@@ -51,30 +49,42 @@ class SyncController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'queue-sync'];
-
-    // Public Methods
-    // =========================================================================
+    protected $allowAnonymous = ['index', 'test'];
 
     /**
-     * Immediately syncs project data to Airtable
-     *
-     * @return \yii\web\Response
-     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
-    public function actionIndex(): \yii\web\Response
+    public function actionIndex()
     {
-//        $this->requireAdmin();
-//        return $this->asJson(Telemetron::$plugin->sync->sync());
+        if(!$this->_auth()) {
+            throw new NotFoundHttpException();
+        }
+
+        $packet = new Packet();
+
+        return $this->asJson($packet);
     }
 
-    /**
-     * @throws ForbiddenHttpException
-     */
-    public function actionQueueSync(): \yii\web\Response
+    public function actionTest()
     {
-//        $this->requireAdmin();
-//        $queue = Craft::$app->getQueue()->push(new Sync());
-//        return $this->asJson('Sync job added to queue.');
+        return $this->asJson(Craft::$app->plugins->getAllPluginInfo());
+    }
+
+    private function _auth()
+    {
+        $headers = $this->request->getHeaders();
+        $token = $headers->get('X-REMOTE-KEY');
+
+        if(!$token) {
+            return false;
+        }
+
+        $pluginKey = App::parseEnv(Telemetron::$plugin->getSettings()->apiKey) ?? Craft::parseEnv(Telemetron::$plugin->getSettings()->apiKey);
+
+        if(!$pluginKey || $pluginKey !== $token) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -120,11 +120,6 @@ class Telemetron extends Plugin
             $this->controllerNamespace = 'simplygoodwork\telemetron\console\controllers';
         }
 
-        // Fire DailySync method whenever CP is hit
-        if(Craft::$app->isInstalled && Craft::$app->request->isCpRequest && !Craft::$app->request->getIsAjax()) {
-          $this->sync->dailySync();
-        }
-
         // Register our utilities
         Event::on(
             Utilities::class,

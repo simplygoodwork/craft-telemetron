@@ -26,18 +26,6 @@
 
 <div>
     {{ forms.autosuggestField({
-        label: 'Base ID',
-        instructions: 'Your Airtable Base ID can be retrieved by going [here](https://airtable.com/api) and selecting the Base you want to interact with.',
-        id: 'baseId',
-        name: 'baseId',
-        value: settings['baseId'],
-        suggestEnvVars: true,
-        required: false,
-        warning: _self.configWarning("baseId", "telemetron"),
-        placeholder: "$TELEMETRON_BASE_ID",
-    }) }}
-
-    {{ forms.autosuggestField({
         label: 'Airtable API Key',
         instructions: 'Your Airtable API key',
         id: 'apiKey',
@@ -49,24 +37,6 @@
         placeholder: "$TELEMETRON_API_KEY",
     }) }}
 
-    {{ forms.autosuggestField({
-        label: 'Table Name',
-        instructions: 'The Airtable table you want this plugin to save information to.',
-        id: 'tableName',
-        name: 'tableName',
-        value: settings['tableName'],
-        suggestEnvVars: true,
-        warning: _self.configWarning("tableName", "telemetron"),
-        required: false
-    }) }}
-
-    {{ forms.lightswitchField({
-        label: "Sync Enabled"|t('telemetron'),
-        id: 'syncEnabled',
-        name: 'syncEnabled',
-        warning: _self.configWarning("syncEnabled", "telemetron"),
-        on: settings['syncEnabled'],
-    }) }}
 </div>
 
 

@@ -38,38 +38,12 @@ class Settings extends Model
   // =========================================================================
 
   /**
-   * Airtable Base ID
-   *
-   * @var string
-   */
-  public $baseId;
-
-  /**
    * @var string
    */
   public $apiKey;
 
-  /**
-   * @var string
-   */
-  public $tableName;
-
-	/**
-	 * @var bool
-	 */
-	public $syncEnabled = false;
-
   // Public Methods
   // =========================================================================
-
-  /**
-   * @inheritdoc
-   */
-  public function __construct(array $config = [])
-  {
-    $config['tableName'] = StringHelper::toTitleCase(getenv('ENVIRONMENT')) . ' Inventory';
-    parent::__construct($config);
-  }
 
 	/**
 	 * @inheritdoc
@@ -79,7 +53,7 @@ class Settings extends Model
 		return [
 			'parser' => [
 				'class' => EnvAttributeParserBehavior::class,
-				'attributes' => ['baseId', 'tableName', 'apiKey'],
+				'attributes' => ['apiKey'],
 			],
 		];
 	}
@@ -94,8 +68,8 @@ class Settings extends Model
   public function rules()
   {
       return [
-          [['baseId', 'apiKey', 'tableName'], 'string'],
-          [['baseId', 'apiKey', 'tableName'], 'required'],
+          [['apiKey'], 'string'],
+          [['apiKey'], 'required'],
       ];
   }
 

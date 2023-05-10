@@ -11,6 +11,7 @@
   namespace simplygoodwork\telemetron\models;
 
   use craft\helpers\App;
+  use craft\helpers\ArrayHelper;
   use craft\helpers\StringHelper;
   use simplygoodwork\telemetron\Telemetron;
 
@@ -33,16 +34,26 @@
     public string $version;
 
     /**
-     * "hash" of the plugin + version, used as ID in Airtable
-     * @var string
-     */
-    public string $hash;
-
-    /**
      * Plugin edition (lite, pro, standard)
      * @var string
      */
     public string $edition;
+
+    public ?string $licensedEdition;
+
+    public array $licenseIssues;
+
+    public string $issueText = '';
+
+    public string $developer;
+
+    public string $description;
+
+    public bool $isTrial;
+
+    public ?bool $upgradeAvailable;
+
+    public bool $private;
 
     /**
      * License status ('trial', 'valid', 'unknown' => '')
@@ -62,9 +73,6 @@
      */
     public function __construct(array $config = [])
     {
-      $name = $config['name'];
-      $version = $config['version'];
-      $config['hash'] = "${name} (${version})";
       $config['edition'] = StringHelper::toTitleCase($config['edition']);
 
       if($config['licenseKeyStatus'] === 'unknown'){
@@ -73,6 +81,9 @@
 
       $config['licenseKeyStatus'] = StringHelper::toTitleCase($config['licenseKeyStatus']);
 
+      if (count($config['licenseIssues'])) {
+          $config['issueText'] = implode(' ', $config['licenseIssues']);
+      }
 
       parent::__construct($config);
     }

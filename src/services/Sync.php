@@ -90,7 +90,6 @@ class Sync extends Component
     }
 
     $packet = new Packet();
-
     $preflightSyncs = $this->_preflightSync($packet);
 
     if(!$preflightSyncs){
@@ -294,7 +293,6 @@ class Sync extends Component
     $tableName = rawurlencode('Database Versions');
 
 		try {
-
 			$recordLookup = $this->airtableClient->table($tableName)
 				->select('*')
 				->where(['Name' => $dbVersion])
