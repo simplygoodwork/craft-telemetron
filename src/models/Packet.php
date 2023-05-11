@@ -112,7 +112,8 @@ class Packet extends Model
 
     public array $emailSettings = [];
 
-    protected RemoteUpdates $pluginUpdateData;
+    protected ?RemoteUpdates $pluginUpdateData = null;
+
     // Public Methods
     // =========================================================================
 
@@ -222,7 +223,7 @@ class Packet extends Model
                     'description' => $plugin['description'],
                     'isTrial' => $plugin['isTrial'],
                     'upgradeAvailable' => $plugin['upgradeAvailable'],
-                    'private' => $plugin['private'],
+                    'private' => $plugin['private'] ?? false,
                 ]))->toArray();
 
                 if (isset($pluginUpdateData['plugins'][$handle])) {
