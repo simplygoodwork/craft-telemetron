@@ -37,39 +37,13 @@ class Settings extends Model
   // =========================================================================
 
   /**
-   * Airtable Base ID
-   *
-   * @var string
-   */
-  public $baseId = '$TELEMETRON_BASE_ID';
-
-  /**
    * @var string
    */
   public $apiKey = '$TELEMETRON_API_KEY';
 
-  /**
-   * @var string
-   */
-  public $tableName;
-
-	/**
-	 * @var string
-	 */
-	public $syncEnabled;
 
   // Public Methods
   // =========================================================================
-
-  /**
-   * @inheritdoc
-   */
-  public function __construct(array $config = [])
-  {
-    $config['tableName'] = StringHelper::toTitleCase(App::env('ENVIRONMENT')) . ' Inventory';
-
-    parent::__construct($config);
-  }
 
   /**
    * Returns the validation rules for attributes.
@@ -81,18 +55,11 @@ class Settings extends Model
   public function rules(): array
   {
       return [
-          [['baseId', 'apiKey', 'tableName'], 'string'],
-          [['baseId', 'apiKey', 'tableName', 'syncEnabled'], 'required'],
+          [['apiKey'], 'string'],
+          [['apiKey'], 'required'],
       ];
   }
 
-  public function getBaseId(): string
-  {
-	  if(!empty($this->baseId)){
-		  return App::parseEnv($this->baseId);
-	  }
-	  return App::env("TELEMETRON_BASE_ID");
-  }
 
   public function getApiKey(): string
   {
@@ -101,21 +68,5 @@ class Settings extends Model
 	  }
 	  return App::env("TELEMETRON_API_KEY");
   }
-
-  public function getTableName(): string
-  {
-    return App::parseEnv($this->tableName);
-  }
-
-	public function getSyncEnabled(): bool
-	{
-		// if env var has been set in settings but the env var has not been set and we're in production, turn on sync
-		if($this->syncEnabled !== '0' && $this->syncEnabled !== '1' && !isset($_ENV[$this->syncEnabled]) && App::env('ENVIRONMENT') === 'production')
-		{
-			return true;
-		}
-
-		return App::parseBooleanEnv($this->syncEnabled) ?? false;
-	}
 
 }

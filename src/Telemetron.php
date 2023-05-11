@@ -11,7 +11,6 @@
 namespace simplygoodwork\telemetron;
 
 use simplygoodwork\telemetron\assetbundles\telemetron\TelemetronAsset;
-use simplygoodwork\telemetron\services\Sync as SyncService;
 use simplygoodwork\telemetron\variables\TelemetronVariable;
 use simplygoodwork\telemetron\models\Settings;
 use simplygoodwork\telemetron\utilities\TelemetronSync as TelemetronSyncUtility;
@@ -45,7 +44,6 @@ use nystudio107\pluginvite\services\VitePluginService;
  * @package   Telemetron
  * @since     1.0.0
  *
- * @property  SyncService $sync
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
@@ -115,11 +113,6 @@ class Telemetron extends Plugin
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'simplygoodwork\telemetron\console\controllers';
-        }
-
-        // Fire DailySync method whenever CP is hit
-        if(Craft::$app->isInstalled && Craft::$app->request->isCpRequest && !Craft::$app->request->getIsAjax()) {
-          $this->sync->dailySync();
         }
 
         // Register our utilities
@@ -200,7 +193,7 @@ class Telemetron extends Plugin
   {
     // Register services as components
     $this->setComponents([
-      'sync' => SyncService::class,
+//      'sync' => SyncService::class,
     ]);
   }
 }
