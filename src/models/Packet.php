@@ -15,7 +15,6 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use simplygoodwork\telemetron\models\RemoteUpdates;
-use simplygoodwork\telemetron\models\RemoteUpdates;
 use simplygoodwork\telemetron\Telemetron;
 
 use Craft;
