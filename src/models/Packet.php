@@ -112,6 +112,8 @@ class Packet extends Model
 
     public $emailSettings = [];
 
+    public $licenseInfo = [];
+
     protected $pluginUpdateData = [];
     // Public Methods
     // =========================================================================
@@ -222,7 +224,7 @@ class Packet extends Model
                     'description' => $plugin['description'],
                     'isTrial' => $plugin['isTrial'],
                     'upgradeAvailable' => $plugin['upgradeAvailable'],
-                    'private' => $plugin['private'],
+                    'private' => $plugin['private'] ?? false,
                 ]))->toArray();
 
                 if (isset($pluginUpdateData['plugins'][$handle])) {
@@ -241,16 +243,16 @@ class Packet extends Model
 
     private function _getCmsUpdates(): array
     {
+				$data = Craft::$app->api->getLicenseInfo();
         $updateData = $this->_getUpdates();
-
-        if (!isset($updateData['cms'])) {
-            return [];
+        if (isset($updateData['cms'])) {
+	        $hasCritical = $updateData['cms']->getHasCritical();
+	        $data = ArrayHelper::merge($data, $updateData['cms']->toArray());
+	        $data['hasCritical'] = $hasCritical;
         }
 
-        $hasCritical = $updateData['cms']->getHasCritical();
-        $data = $updateData['cms']->toArray();
         $data['phpConstraint'] = preg_replace('/[^0-9.]/', '', $data['phpConstraint']);
-        $data['hasCritical'] = $hasCritical;
+				$data['trial'] = Craft::$app->getLicensedEdition() !== Craft::$app->getEdition();
         return $data;
     }
 
