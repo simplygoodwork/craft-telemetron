@@ -49,7 +49,7 @@ class DataController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'test'];
+    protected $allowAnonymous = ['index'];
 
     /**
      * @throws NotFoundHttpException
@@ -63,11 +63,6 @@ class DataController extends Controller
         $packet = new Packet();
 
         return $this->asJson($packet);
-    }
-
-    public function actionTest()
-    {
-        return $this->asJson(Craft::$app->plugins->getAllPluginInfo());
     }
 
     private function _auth()
